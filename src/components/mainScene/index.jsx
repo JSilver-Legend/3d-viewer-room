@@ -1,80 +1,60 @@
-import React, { Suspense, useState } from 'react';
-import { useDrag } from '@use-gesture/react';
+import React, { useState } from 'react';
 import { Canvas } from '@react-three/fiber';
-import { useGLTF } from '@react-three/drei';
+import Model from '../model';
+
+import Texture01 from '../../assets/texture-1.png';
+import Texture02 from '../../assets/texture-2.png';
+import Texture03 from '../../assets/texture-3.png';
+import Model01 from '../../assets/model-1.png';
+import Model02 from '../../assets/model-2.png';
+import Model03 from '../../assets/model-3.png';
+
 import './style.css';
 
 const MainScene = () => {
 
-  const { scene } = useGLTF('/assets/glb/chair.glb');
+  const [selectedTexture, setSelectedTexture] = useState('texture-1');
+  const [selectedModel, setSelectedModel] = useState('model-1');
   
-  const [rotate, setRotate] = useState(0);
-  const [ringColor, setRingColor] = useState('white');
-  const [positionX, setPositionX] = useState(0);
-  const [positionY, setPositionY] = useState(-4);
-  const [isRotating, setIsRotating] = useState(false);
-
-  const bindRotate = useDrag(
-    ({ down, delta, first }) => {
-      if( first ) {
-        setIsRotating(true);
-      }
-      if( down ) {
-        setRotate((prev)=>prev+delta[0]*0.01)
-      }
-    },
-    { pointerEvents: true },
-  );
-
-  const bindChair = useDrag(
-    ({ down, delta, first }) => {
-      if( first ) {
-        setIsRotating(false);
-      }
-      if( down && !isRotating  ) {
-        setPositionX((prev)=>prev+delta[0]*0.01);
-        setPositionY((prev)=>prev+delta[1]*0.01);
-      }
-    },
-    { pointerEvents: true }
-  );
-
   return (
-    <Canvas 
-      className='canvas-scene'
-      camera={{
-        fov: "45",
-        aspect: window.innerWidth / window.innerHeight,
-        near: 0.1,
-        far: 100,
-        position: [0, -0.7, 7],
-      }}
-    >
-      <ambientLight intensity={0.4} />
-      <directionalLight intensity={1.4} />
-      <group position={[positionX,-3,positionY]} rotation={[-0.1,rotate,0]} >
-        <group name='chair-group'>
-          <group {...bindChair()} name='chair' scale={[1.4,1.4,1.4]} >
-            <Suspense fallback={null} >
-              <primitive object={scene} >
-                <mesh />
-              </primitive>
-            </Suspense>
-          </group>
-          <group {...bindRotate()} name='arrow'onPointerEnter={()=>{ setRingColor('red') }} onPointerLeave={()=>{ setRingColor('white') }} >
-            <mesh position={[0,-0.5,0]} rotation={[Math.PI/2,0,0]} >
-              <torusGeometry args={[1.3, 0.03, 3, 500]} />
-              <meshStandardMaterial color={ringColor} />
-            </mesh>
-            {/* <mesh position={[0,-0.5,1.3]} rotation={[0,0,-Math.PI/2]}>
-              <coneGeometry args={[0.05,0.18,30]} />
-              <meshStandardMaterial color={'red'} />
-            </mesh> */}
-          </group>
-          {/* <gridHelper args={[70,20]} position={[0,-0.5,0]} /> */}
-        </group>
-      </group>
-    </Canvas>
+    <>
+      <div className='menu-left'>
+        <div className='menu-item' onClick={()=>{ setSelectedModel('model-1'); }} >
+          <img alt='model01' width={80} height={80} src={Model01} />
+        </div>
+        <div className='menu-item' onClick={()=>{ setSelectedModel('model-2'); }}>
+          <img alt='model02' width={80} height={80} src={Model02} />
+        </div>
+        <div className='menu-item' onClick={()=>{ setSelectedModel('model-3'); }}>
+          <img alt='model03' width={80} height={80} src={Model03} />
+        </div>
+      </div>
+      <div className='menu-right'>
+        <div className='menu-item' onClick={()=>{ setSelectedTexture('texture-1'); }} >
+          <img alt='texture01' width={80} height={80} src={Texture01} />
+        </div>
+        <div className='menu-item' onClick={()=>{ setSelectedTexture('texture-2'); }}>
+          <img alt='texture02' width={80} height={80} src={Texture02} />
+        </div>
+        <div className='menu-item' onClick={()=>{ setSelectedTexture('texture-3'); }}>
+          <img alt='texture03' width={80} height={80} src={Texture03} />
+        </div>
+      </div>
+      <Canvas 
+        className='canvas-scene'
+        camera={{
+          fov: 45,
+          aspect: window.innerWidth / window.innerHeight,
+          near: 0.1,
+          far: 10000,
+          position: [0, -0.7, 7],
+        }}
+      >
+        <ambientLight intensity={1} />
+        <directionalLight intensity={1.4} />
+        <Model selectedTexture={selectedTexture} selectedModel={selectedModel} />
+      </Canvas>
+    </>
   )
 }
 
