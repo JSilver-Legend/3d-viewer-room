@@ -1,0 +1,7 @@
+.canvas-scene {
+  width: 100%;
+  height: 100vh !important;
+  /* background-color: aqua; */
+  background-image: url('/public/assets/image/room.jpg');
+  background-size: cover;
+}
