@@ -1,21 +1,25 @@
-import React, { useState, Suspense, useEffect } from 'react';
+import * as THREE from 'three';
+import React, { useState, Suspense, useEffect, useRef, useLayoutEffect } from 'react';
 import { useDrag } from '@use-gesture/react';
-import { TextureLoader, DoubleSide } from 'three';
-import { useLoader, useThree } from '@react-three/fiber';
+import { TextureLoader, DoubleSide, BoxGeometry } from 'three';
+import { useFrame, useLoader, useThree } from '@react-three/fiber';
 import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader";
 import { MeshStandardMaterial } from 'three';
 import { RepeatWrapping } from 'three';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 
 import Texture01 from '../../assets/texture-1.png';
 import Texture02 from '../../assets/texture-2.png';
 import Texture03 from '../../assets/texture-3.png';
+import { useGLTF } from '@react-three/drei';
 
-const Model = ({selectedTexture, selectedModel}) => {
-  console.log('props', selectedTexture, selectedModel);
-  const bed = useLoader(OBJLoader, '/assets/glb/bed.obj');
-  const largeBox = useLoader(OBJLoader, '/assets/glb/largebox.obj');
-  const smallBox = useLoader(OBJLoader, '/assets/glb/smallbox.obj');
+const Model = ({ selectedTexture, selectedModel, mouseState, setScaleValue }) => {
+  
+  const bed = useLoader(GLTFLoader, '/assets/glb/bed.glb').scene;
+  const largeBox = useLoader(GLTFLoader, '/assets/glb/largeBox.glb').scene;
+  const smallBox = useLoader(GLTFLoader, '/assets/glb/smallbox.glb').scene;
 
+  const torusRef = useRef();
   const [rotate, setRotate] = useState(0);
   const [ringColor, setRingColor] = useState('white');
   const [positionX, setPositionX] = useState(0);
@@ -28,10 +32,14 @@ const Model = ({selectedTexture, selectedModel}) => {
   const textureImg03 = new TextureLoader().load(Texture03);
 
   const { gl } = useThree();
-  // textureImg03.anisotropy = Math.min(gl.capabilities.getMaxAnisotropy(), 50)
-  // textureImg03.wrapS = RepeatWrapping;
-  // textureImg03.wrapT = RepeatWrapping;
-  // textureImg03.repeat.set(1, 1);
+  textureImg03.anisotropy = Math.min(gl.capabilities.getMaxAnisotropy(), 50)
+  textureImg03.wrapS = RepeatWrapping;
+  textureImg03.wrapT = RepeatWrapping;
+  textureImg03.repeat.set(1, 1);
+
+  const handleSetScaleValue = (value) => {
+    setScaleValue(value)
+  }
 
   useEffect(() => {
     var currentTexture;
@@ -40,14 +48,13 @@ const Model = ({selectedTexture, selectedModel}) => {
     else if( selectedTexture === 'texture-3' ) currentTexture = textureImg03;
 
     if( model !== undefined ) {
-      model.children.map((item)=>{
+      model.traverse(function (item) {
         if( item.name === 'wood_obj' ) {
           item.material = new MeshStandardMaterial({
             side: DoubleSide,
             map: currentTexture,
-            bumpMap: currentTexture,
+            metalness: 0.7,
             roughness: 0.3,
-            bumpScale: 0.2,
           });
         }
       })
@@ -56,11 +63,13 @@ const Model = ({selectedTexture, selectedModel}) => {
   
   useEffect(() => {
     if( model !== undefined ) {
-      model.children.map((item)=>{
+      model.traverse(function (item) {
         if( item.name === 'wood_obj' ) {
           item.material = new MeshStandardMaterial({
             side: DoubleSide,
-            map: textureImg01
+            map: textureImg03,
+            metalness: 0.7,
+            roughness: 0.3,
           });
         } else if( item.name === 'cloth_obj' ) {
           item.material = new MeshStandardMaterial({
@@ -78,7 +87,7 @@ const Model = ({selectedTexture, selectedModel}) => {
       })
     }
   }, [model]);
-  
+  //exchange model
   useEffect(() => {
     if( selectedModel === 'model-1' ) setModel(bed);
     else if( selectedModel === 'model-2' ) setModel(largeBox);
@@ -86,6 +95,51 @@ const Model = ({selectedTexture, selectedModel}) => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedModel])
 
+  useEffect(() => {
+    model.scale.x = 1;
+    model.scale.y = 1;
+    model.scale.z = 1;
+
+    torusRef.current.scale.x = 1;
+    torusRef.current.scale.y = 1;
+    torusRef.current.scale.z = 1;
+
+    handleSetScaleValue(1);
+  }, [model])
+  
+
+  useFrame(() => {
+    if (model !== undefined && torusRef.current !== undefined) {
+      if (mouseState === "increase") {
+        if (model.scale.x < 2.49) {
+          model.scale.x += 0.01;
+          model.scale.y += 0.01;
+          model.scale.z += 0.01;
+
+          torusRef.current.scale.x += 0.01;
+          torusRef.current.scale.y += 0.01;
+          torusRef.current.scale.z += 0.01;
+
+        }
+      }
+      else if (mouseState === "decrease") {
+        if (model.scale.x > 1) {
+          model.scale.x -= 0.01;
+          model.scale.y -= 0.01;
+          model.scale.z -= 0.01;
+
+          torusRef.current.scale.x -= 0.01;
+          torusRef.current.scale.y -= 0.01;
+          torusRef.current.scale.z -= 0.01;
+
+        }
+      }
+      if (mouseState !== "none") {
+        handleSetScaleValue(model.scale.x.toFixed(2));
+      }
+    }
+  })
+  
   const bindRotate = useDrag(
     ({ down, delta, first }) => {
       if( first ) {
@@ -112,20 +166,22 @@ const Model = ({selectedTexture, selectedModel}) => {
   );
 
   return (
-    <group position={[positionX,-3,positionY]} rotation={[-0.1,rotate,0]} >
-      <group name='chair-group'>
-        <group {...bindChair()} name='chair' position={[0,-0.5,0]} scale={[1.5,1.5,1.5]} >
-          <Suspense fallback={null} >
-            <primitive object={model} >
-              <mesh />
-            </primitive>
-          </Suspense>
-        </group>
-        <group {...bindRotate()} name='arrow'onPointerEnter={()=>{ setRingColor('red') }} onPointerLeave={()=>{ setRingColor('white') }} >
-          <mesh position={[0,-0.5,0]} rotation={[Math.PI/2,0,0]} >
-            <torusGeometry args={[1.3, 0.03, 3, 500]} />
-            <meshStandardMaterial color={ringColor} />
-          </mesh>
+    <group>
+      <group position={[positionX,-2.2,positionY]} rotation={[-0.1,rotate,0]} scale={[3, 3, 3]} >
+        <group name='chair-group'>
+          <group {...bindChair()} name='chair' position={[0,-0.5,0]} scale={[500, 500, 500]} >
+            <Suspense fallback={null} >
+              <primitive object={model} >
+                <mesh />
+              </primitive>
+            </Suspense>
+          </group>
+          <group {...bindRotate()} name='arrow'onPointerEnter={()=>{ setRingColor('red') }} onPointerLeave={()=>{ setRingColor('white') }} >
+            <mesh ref={torusRef} position={[0,-0.5,0]} rotation={[Math.PI/2,0,0]} >
+              <torusGeometry args={[0.8, 0.02, 3, 500]} />
+              <meshStandardMaterial color={ringColor} />
+            </mesh>
+          </group>
         </group>
       </group>
     </group>

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Canvas } from '@react-three/fiber';
 import Model from '../model';
 
@@ -15,6 +15,8 @@ const MainScene = () => {
 
   const [selectedTexture, setSelectedTexture] = useState('texture-1');
   const [selectedModel, setSelectedModel] = useState('model-1');
+  const [mouseState, setMouseState] = useState("none")
+  const [scaleValue, setScaleValue] = useState(1)
   
   return (
     <>
@@ -39,20 +41,26 @@ const MainScene = () => {
         <div className='menu-item' onClick={()=>{ setSelectedTexture('texture-3'); }}>
           <img alt='texture03' width={80} height={80} src={Texture03} />
         </div>
+        <div className='handle-scale-area'>
+          {/* <label>{scaleValue}</label> */}
+          <button style={{ borderColor: "white", borderRadius: 10, height: 30}} onPointerDown={() => setMouseState("increase")} onMouseUp={() => setMouseState("none")}>scale +</button>
+          <button style={{ borderColor: "white", borderRadius: 10, height: 30}} onPointerDown={() => setMouseState("decrease")} onMouseUp={() => setMouseState("none")}>scale -</button>
+        </div>
       </div>
+
       <Canvas 
         className='canvas-scene'
         camera={{
-          fov: 45,
+          fov: 35,
           aspect: window.innerWidth / window.innerHeight,
           near: 0.1,
           far: 10000,
-          position: [0, -0.7, 7],
+          position: [0, 0, 9],
         }}
       >
         <ambientLight intensity={1} />
         <directionalLight intensity={1.4} />
-        <Model selectedTexture={selectedTexture} selectedModel={selectedModel} />
+        <Model selectedTexture={selectedTexture} selectedModel={selectedModel} mouseState={mouseState} setScaleValue={setScaleValue} />
       </Canvas>
     </>
   )
