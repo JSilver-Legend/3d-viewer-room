@@ -46,8 +46,8 @@ const Model = ({ selectedTexture, selectedModel, mouseState }) => {
           item.material = new MeshStandardMaterial({
             side: DoubleSide,
             map: currentTexture,
-            metalness: 0.7,
-            roughness: 0.3,
+            metalness: 0.75,
+            roughness: 0,
           });
         }
       })
@@ -62,7 +62,7 @@ const Model = ({ selectedTexture, selectedModel, mouseState }) => {
           item.material = new MeshStandardMaterial({
             side: DoubleSide,
             map: textureImg03,
-            metalness: 0.7,
+            metalness: 0.75,
             roughness: 0,
           });
         } else if( item.name === 'cloth_obj' ) {
