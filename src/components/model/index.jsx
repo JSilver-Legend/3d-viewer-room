@@ -13,7 +13,7 @@ import Texture03 from '../../assets/texture-3.png';
 const Model = ({ selectedTexture, selectedModel }) => {
   
   const bed = useLoader(GLTFLoader, '/assets/glb/bed.glb').scene;
-  const largeBox = useLoader(GLTFLoader, '/assets/glb/largeBox.glb').scene;
+  const largeBox = useLoader(GLTFLoader, '/assets/glb/largebox.glb').scene;
   const smallBox = useLoader(GLTFLoader, '/assets/glb/smallbox.glb').scene;
 
   const torusRef = useRef();
