@@ -14,7 +14,7 @@ const Model = ({ selectedTexture, selectedModel }) => {
   
   const bed = useLoader(GLTFLoader, '/assets/glb/bed.glb').scene;
   // const largeBox = useLoader(GLTFLoader, '/assets/glb/largeBox.glb').scene;
-  // const smallBox = useLoader(GLTFLoader, '/assets/glb/smallbox.glb').scene;
+  const smallBox = useLoader(GLTFLoader, '/assets/glb/smallbox.glb').scene;
 
   const torusRef = useRef();
   const [rotate, setRotate] = useState(0);
@@ -86,7 +86,7 @@ const Model = ({ selectedTexture, selectedModel }) => {
   useEffect(() => {
     if( selectedModel === 'model-1' ) setModel(bed);
     // else if( selectedModel === 'model-2' ) setModel(largeBox);
-    // else if( selectedModel === 'model-3' ) setModel(smallBox);
+    else if( selectedModel === 'model-3' ) setModel(smallBox);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedModel])
 
