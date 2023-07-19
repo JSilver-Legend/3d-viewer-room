@@ -58,14 +58,12 @@ const Model = ({ selectedTexture, selectedModel, mouseState }) => {
   useEffect(() => {
     if( model !== undefined ) {
       model.traverse(function (item) {
-        item.receiveShadow = true;
-        item.castShadow = true;
         if( item.name === 'wood_obj' ) {
           item.material = new MeshStandardMaterial({
             side: DoubleSide,
             map: textureImg03,
             metalness: 0.7,
-            roughness: 0.3,
+            roughness: 0,
           });
         } else if( item.name === 'cloth_obj' ) {
           item.material = new MeshStandardMaterial({

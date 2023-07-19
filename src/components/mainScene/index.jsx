@@ -56,8 +56,8 @@ const MainScene = () => {
           position: [0, 0, 9],
         }}
       >
-        <ambientLight intensity={1} />
-        <directionalLight intensity={2} position={[10, 10, 0]} />
+        <ambientLight intensity={2} />
+        <directionalLight intensity={0.5} position={[10, 10, 0]} />
         <directionalLight intensity={0.5} position={[10, 10, 10]} />
         <Model selectedTexture={selectedTexture} selectedModel={selectedModel} mouseState={mouseState} />
       </Canvas>
