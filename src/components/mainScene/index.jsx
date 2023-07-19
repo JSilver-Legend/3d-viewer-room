@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Canvas } from '@react-three/fiber';
 import Model from '../model';
 
@@ -16,7 +16,6 @@ const MainScene = () => {
   const [selectedTexture, setSelectedTexture] = useState('texture-1');
   const [selectedModel, setSelectedModel] = useState('model-1');
   const [mouseState, setMouseState] = useState("none")
-  const [scaleValue, setScaleValue] = useState(1)
   
   return (
     <>
@@ -42,7 +41,6 @@ const MainScene = () => {
           <img alt='texture03' width={80} height={80} src={Texture03} />
         </div>
         <div className='handle-scale-area'>
-          {/* <label>{scaleValue}</label> */}
           <button style={{ borderColor: "white", borderRadius: 10, height: 30}} onPointerDown={() => setMouseState("increase")} onMouseUp={() => setMouseState("none")}>scale +</button>
           <button style={{ borderColor: "white", borderRadius: 10, height: 30}} onPointerDown={() => setMouseState("decrease")} onMouseUp={() => setMouseState("none")}>scale -</button>
         </div>
@@ -59,8 +57,9 @@ const MainScene = () => {
         }}
       >
         <ambientLight intensity={1} />
-        <directionalLight intensity={1.4} />
-        <Model selectedTexture={selectedTexture} selectedModel={selectedModel} mouseState={mouseState} setScaleValue={setScaleValue} />
+        <directionalLight intensity={2} position={[10, 10, 0]} />
+        <directionalLight intensity={0.5} position={[10, 10, 10]} />
+        <Model selectedTexture={selectedTexture} selectedModel={selectedModel} mouseState={mouseState} />
       </Canvas>
     </>
   )

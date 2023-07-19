@@ -1,9 +1,7 @@
-import * as THREE from 'three';
-import React, { useState, Suspense, useEffect, useRef, useLayoutEffect } from 'react';
+import React, { useState, Suspense, useEffect, useRef } from 'react';
 import { useDrag } from '@use-gesture/react';
-import { TextureLoader, DoubleSide, BoxGeometry } from 'three';
+import { TextureLoader, DoubleSide } from 'three';
 import { useFrame, useLoader, useThree } from '@react-three/fiber';
-import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader";
 import { MeshStandardMaterial } from 'three';
 import { RepeatWrapping } from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
@@ -11,9 +9,8 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import Texture01 from '../../assets/texture-1.png';
 import Texture02 from '../../assets/texture-2.png';
 import Texture03 from '../../assets/texture-3.png';
-import { useGLTF } from '@react-three/drei';
 
-const Model = ({ selectedTexture, selectedModel, mouseState, setScaleValue }) => {
+const Model = ({ selectedTexture, selectedModel, mouseState }) => {
   
   const bed = useLoader(GLTFLoader, '/assets/glb/bed.glb').scene;
   const largeBox = useLoader(GLTFLoader, '/assets/glb/largeBox.glb').scene;
@@ -37,10 +34,6 @@ const Model = ({ selectedTexture, selectedModel, mouseState, setScaleValue }) =>
   textureImg03.wrapT = RepeatWrapping;
   textureImg03.repeat.set(1, 1);
 
-  const handleSetScaleValue = (value) => {
-    setScaleValue(value)
-  }
-
   useEffect(() => {
     var currentTexture;
     if( selectedTexture === 'texture-1' ) currentTexture = textureImg01;
@@ -59,11 +52,14 @@ const Model = ({ selectedTexture, selectedModel, mouseState, setScaleValue }) =>
         }
       })
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedTexture]);
   
   useEffect(() => {
     if( model !== undefined ) {
       model.traverse(function (item) {
+        item.receiveShadow = true;
+        item.castShadow = true;
         if( item.name === 'wood_obj' ) {
           item.material = new MeshStandardMaterial({
             side: DoubleSide,
@@ -86,6 +82,7 @@ const Model = ({ selectedTexture, selectedModel, mouseState, setScaleValue }) =>
         }
       })
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [model]);
   //exchange model
   useEffect(() => {
@@ -104,10 +101,9 @@ const Model = ({ selectedTexture, selectedModel, mouseState, setScaleValue }) =>
     torusRef.current.scale.y = 1;
     torusRef.current.scale.z = 1;
 
-    handleSetScaleValue(1);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [model])
   
-
   useFrame(() => {
     if (model !== undefined && torusRef.current !== undefined) {
       if (mouseState === "increase") {
@@ -133,9 +129,6 @@ const Model = ({ selectedTexture, selectedModel, mouseState, setScaleValue }) =>
           torusRef.current.scale.z -= 0.01;
 
         }
-      }
-      if (mouseState !== "none") {
-        handleSetScaleValue(model.scale.x.toFixed(2));
       }
     }
   })
