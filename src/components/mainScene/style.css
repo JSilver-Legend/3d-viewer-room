@@ -6,6 +6,15 @@
   background-size: cover;
 }
 
+.hint-area {
+  width: 100%;
+  z-index: 10;
+  display: flex;
+  justify-content: center;
+  position: fixed;
+  top: 10px;
+}
+
 .menu-left {
   z-index: 10;
   position: fixed;

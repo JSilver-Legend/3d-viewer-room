@@ -15,10 +15,13 @@ const MainScene = () => {
 
   const [selectedTexture, setSelectedTexture] = useState('texture-1');
   const [selectedModel, setSelectedModel] = useState('model-1');
-  const [mouseState, setMouseState] = useState("none")
+  // const [mouseState, setMouseState] = useState("none")
   
   return (
     <>
+      <div className='hint-area'>
+        <p>You can use the scroll to resize the model.</p>
+      </div>
       <div className='menu-left'>
         <div className='menu-item' onClick={()=>{ setSelectedModel('model-1'); }} >
           <img alt='model01' width={80} height={80} src={Model01} />
@@ -40,10 +43,10 @@ const MainScene = () => {
         <div className='menu-item' onClick={()=>{ setSelectedTexture('texture-3'); }}>
           <img alt='texture03' width={80} height={80} src={Texture03} />
         </div>
-        <div className='handle-scale-area'>
+        {/* <div className='handle-scale-area'>
           <button style={{ borderColor: "white", borderRadius: 10, height: 30}} onPointerDown={() => setMouseState("increase")} onMouseUp={() => setMouseState("none")}>scale +</button>
           <button style={{ borderColor: "white", borderRadius: 10, height: 30}} onPointerDown={() => setMouseState("decrease")} onMouseUp={() => setMouseState("none")}>scale -</button>
-        </div>
+        </div> */}
       </div>
 
       <Canvas 
@@ -59,7 +62,7 @@ const MainScene = () => {
         <ambientLight intensity={2} />
         <directionalLight intensity={2} position={[10, 10, 0]} />
         <directionalLight intensity={0.5} position={[10, 10, 10]} />
-        <Model selectedTexture={selectedTexture} selectedModel={selectedModel} mouseState={mouseState} />
+        <Model selectedTexture={selectedTexture} selectedModel={selectedModel} />
       </Canvas>
     </>
   )

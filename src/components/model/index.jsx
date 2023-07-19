@@ -1,7 +1,7 @@
 import React, { useState, Suspense, useEffect, useRef } from 'react';
 import { useDrag } from '@use-gesture/react';
 import { TextureLoader, DoubleSide } from 'three';
-import { useFrame, useLoader, useThree } from '@react-three/fiber';
+import { useLoader, useThree } from '@react-three/fiber';
 import { MeshStandardMaterial } from 'three';
 import { RepeatWrapping } from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
@@ -10,7 +10,7 @@ import Texture01 from '../../assets/texture-1.png';
 import Texture02 from '../../assets/texture-2.png';
 import Texture03 from '../../assets/texture-3.png';
 
-const Model = ({ selectedTexture, selectedModel, mouseState }) => {
+const Model = ({ selectedTexture, selectedModel }) => {
   
   const bed = useLoader(GLTFLoader, '/assets/glb/bed.glb').scene;
   const largeBox = useLoader(GLTFLoader, '/assets/glb/largeBox.glb').scene;
@@ -91,45 +91,42 @@ const Model = ({ selectedTexture, selectedModel, mouseState }) => {
   }, [selectedModel])
 
   useEffect(() => {
-    model.scale.x = 1;
-    model.scale.y = 1;
-    model.scale.z = 1;
+    if (model !== undefined && torusRef !== undefined) {
+      model.scale.x = 1;
+      model.scale.y = 1;
+      model.scale.z = 1;
 
-    torusRef.current.scale.x = 1;
-    torusRef.current.scale.y = 1;
-    torusRef.current.scale.z = 1;
+      torusRef.current.scale.x = 1;
+      torusRef.current.scale.y = 1;
+      torusRef.current.scale.z = 1;
+
+      document.addEventListener("wheel", (event) => {
+        if (event.deltaY < 0) {
+          if (model.scale.x < 1.49) {
+            model.scale.x += 0.01;
+            model.scale.y += 0.01;
+            model.scale.z += 0.01;
+  
+            torusRef.current.scale.x += 0.01;
+            torusRef.current.scale.y += 0.01;
+            torusRef.current.scale.z += 0.01;
+          }
+        } else if (event.deltaY > 0) {
+          if (model.scale.x > 1) {
+            model.scale.x -= 0.01;
+            model.scale.y -= 0.01;
+            model.scale.z -= 0.01;
+  
+            torusRef.current.scale.x -= 0.01;
+            torusRef.current.scale.y -= 0.01;
+            torusRef.current.scale.z -= 0.01;
+          }
+        }
+      })
+    }
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [model])
-  
-  useFrame(() => {
-    if (model !== undefined && torusRef.current !== undefined) {
-      if (mouseState === "increase") {
-        if (model.scale.x < 2.49) {
-          model.scale.x += 0.01;
-          model.scale.y += 0.01;
-          model.scale.z += 0.01;
-
-          torusRef.current.scale.x += 0.01;
-          torusRef.current.scale.y += 0.01;
-          torusRef.current.scale.z += 0.01;
-
-        }
-      }
-      else if (mouseState === "decrease") {
-        if (model.scale.x > 1) {
-          model.scale.x -= 0.01;
-          model.scale.y -= 0.01;
-          model.scale.z -= 0.01;
-
-          torusRef.current.scale.x -= 0.01;
-          torusRef.current.scale.y -= 0.01;
-          torusRef.current.scale.z -= 0.01;
-
-        }
-      }
-    }
-  })
   
   const bindRotate = useDrag(
     ({ down, delta, first }) => {
