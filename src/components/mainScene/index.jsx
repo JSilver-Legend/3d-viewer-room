@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Canvas } from '@react-three/fiber';
+import { OrbitControls } from '@react-three/drei';
 import Model from '../model';
 
 import Texture01 from '../../assets/texture-1.png';
@@ -52,13 +53,23 @@ const MainScene = () => {
       <Canvas 
         className='canvas-scene'
         camera={{
-          fov: 35,
+          fov: 25,
           aspect: window.innerWidth / window.innerHeight,
-          near: 0.1,
-          far: 10000,
-          position: [0, 0, 9],
+          near: 1,
+          far: 1000,
         }}
+        logarithmicdepthbuffer="true"
+        antialias="true"
+        powerpreference="high-performance"
       >
+        <OrbitControls
+          minAzimuthAngle={0}
+          maxAzimuthAngle={0}
+          minPolarAngle={Math.PI / 2.1}
+          maxPolarAngle={Math.PI / 2.1}
+          enableZoom={false}
+          enableRotate={false}
+        />
         <ambientLight intensity={2} />
         <directionalLight intensity={2} position={[10, 10, 0]} />
         <directionalLight intensity={0.5} position={[10, 10, 10]} />

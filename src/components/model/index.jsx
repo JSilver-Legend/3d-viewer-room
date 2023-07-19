@@ -1,9 +1,8 @@
 import React, { useState, Suspense, useEffect, useRef } from 'react';
 import { useDrag } from '@use-gesture/react';
 import { TextureLoader, DoubleSide } from 'three';
-import { useLoader, useThree } from '@react-three/fiber';
+import { useLoader } from '@react-three/fiber';
 import { MeshStandardMaterial } from 'three';
-import { RepeatWrapping } from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 
 import Texture01 from '../../assets/texture-1.png';
@@ -27,12 +26,6 @@ const Model = ({ selectedTexture, selectedModel }) => {
   const textureImg01 = new TextureLoader().load(Texture01);
   const textureImg02 = new TextureLoader().load(Texture02);
   const textureImg03 = new TextureLoader().load(Texture03);
-
-  const { gl } = useThree();
-  textureImg03.anisotropy = Math.min(gl.capabilities.getMaxAnisotropy(), 50)
-  textureImg03.wrapS = RepeatWrapping;
-  textureImg03.wrapT = RepeatWrapping;
-  textureImg03.repeat.set(1, 1);
 
   useEffect(() => {
     var currentTexture;
@@ -128,14 +121,15 @@ const Model = ({ selectedTexture, selectedModel }) => {
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [model])
-  
+
   const bindRotate = useDrag(
-    ({ down, delta, first }) => {
+    ({ down, delta, first, event }) => {
+      console.log('event', event);
       if( first ) {
         setIsRotating(true);
       }
       if( down ) {
-        setRotate((prev)=>prev+delta[0]*0.01)
+        setRotate((prev)=>prev+delta[0]*0.01);
       }
     },
     { pointerEvents: true },
@@ -147,8 +141,8 @@ const Model = ({ selectedTexture, selectedModel }) => {
         setIsRotating(false);
       }
       if( down && !isRotating  ) {
-        setPositionX((prev)=>prev+delta[0]*0.01);
-        setPositionY((prev)=>prev+delta[1]*0.01);
+        setPositionX((prev)=>prev+delta[0]*0.005);
+        setPositionY((prev)=>prev+delta[1]*0.005);
       }
     },
     { pointerEvents: true }
@@ -156,7 +150,7 @@ const Model = ({ selectedTexture, selectedModel }) => {
 
   return (
     <group>
-      <group position={[positionX,-2.2,positionY]} rotation={[-0.1,rotate,0]} scale={[3, 3, 3]} >
+      <group position={[positionX,-1.3,positionY]} rotation={[-0.1,rotate,0]} scale={[1.3, 1.3, 1.3]} >
         <group name='chair-group'>
           <group {...bindChair()} name='chair' position={[0,-0.5,0]} scale={[500, 500, 500]} >
             <Suspense fallback={null} >
@@ -165,7 +159,7 @@ const Model = ({ selectedTexture, selectedModel }) => {
               </primitive>
             </Suspense>
           </group>
-          <group {...bindRotate()} name='arrow'onPointerEnter={()=>{ setRingColor('red') }} onPointerLeave={()=>{ setRingColor('white') }} >
+          <group {...bindRotate()} name='arrow' onPointerEnter={()=>{ setRingColor('red') }} onPointerLeave={()=>{ setRingColor('white') }} >
             <mesh ref={torusRef} position={[0,-0.5,0]} rotation={[Math.PI/2,0,0]} >
               <torusGeometry args={[0.8, 0.02, 3, 500]} />
               <meshStandardMaterial color={ringColor} />
