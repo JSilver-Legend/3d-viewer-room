@@ -35,7 +35,9 @@ const Model = ({ selectedTexture, selectedModel }) => {
 
     if( model !== undefined ) {
       model.traverse(function (item) {
-        if( item.name === 'wood_obj' ) {
+        item.castShadow = true;
+        item.receiveShadow = true;
+        if( item.name === 'wood_obj' ) {          
           item.material = new MeshStandardMaterial({
             side: DoubleSide,
             map: currentTexture,
@@ -51,6 +53,8 @@ const Model = ({ selectedTexture, selectedModel }) => {
   useEffect(() => {
     if( model !== undefined ) {
       model.traverse(function (item) {
+        item.castShadow = true;
+        item.receiveShadow = true;
         if( item.name === 'wood_obj' ) {
           item.material = new MeshStandardMaterial({
             side: DoubleSide,
@@ -83,7 +87,7 @@ const Model = ({ selectedTexture, selectedModel }) => {
     else if( selectedModel === 'model-3' ) setModel(smallBox);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedModel])
-
+  //scale value set
   useEffect(() => {
     if (model !== undefined && torusRef !== undefined) {
       model.scale.x = 1;
@@ -124,7 +128,6 @@ const Model = ({ selectedTexture, selectedModel }) => {
 
   const bindRotate = useDrag(
     ({ down, delta, first, event }) => {
-      console.log('event', event);
       if( first ) {
         setIsRotating(true);
       }
@@ -149,22 +152,20 @@ const Model = ({ selectedTexture, selectedModel }) => {
   );
 
   return (
-    <group>
-      <group position={[positionX,-1.3,positionY]} rotation={[-0.1,rotate,0]} scale={[1.3, 1.3, 1.3]} >
-        <group name='chair-group'>
-          <group {...bindChair()} name='chair' position={[0,-0.5,0]} scale={[500, 500, 500]} >
-            <Suspense fallback={null} >
-              <primitive object={model} >
-                <mesh />
-              </primitive>
-            </Suspense>
-          </group>
-          <group {...bindRotate()} name='arrow' onPointerEnter={()=>{ setRingColor('red') }} onPointerLeave={()=>{ setRingColor('white') }} >
-            <mesh ref={torusRef} position={[0,-0.5,0]} rotation={[Math.PI/2,0,0]} >
-              <torusGeometry args={[0.8, 0.02, 3, 500]} />
-              <meshStandardMaterial color={ringColor} />
-            </mesh>
-          </group>
+    <group castShadow receiveShadow position={[positionX,-1.3,positionY]} rotation={[-0.1,rotate,0]} scale={[1.3, 1.3, 1.3]} >
+      <group castShadow receiveShadow name='chair-group'>
+        <group castShadow receiveShadow {...bindChair()} name='chair' position={[0,-0.5,0]} scale={[500, 500, 500]} >
+          <Suspense fallback={null} >
+            <primitive object={model} >
+              <mesh />
+            </primitive>
+          </Suspense>
+        </group>
+        <group {...bindRotate()} name='arrow' onPointerEnter={()=>{ setRingColor('red') }} onPointerLeave={()=>{ setRingColor('white') }} >
+          <mesh ref={torusRef} position={[0,-0.5,0]} rotation={[Math.PI/2,0,0]} >
+            <torusGeometry args={[0.8, 0.02, 3, 500]} />
+            <meshStandardMaterial color={ringColor} />
+          </mesh>
         </group>
       </group>
     </group>

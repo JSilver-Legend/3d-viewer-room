@@ -58,9 +58,10 @@ const MainScene = () => {
           near: 1,
           far: 1000,
         }}
-        logarithmicdepthbuffer="true"
-        antialias="true"
-        powerpreference="high-performance"
+        // logarithmicdepthbuffer="true"
+        // antialias="true"
+        // powerpreference="high-performance"
+        shadows
       >
         <OrbitControls
           minAzimuthAngle={0}
@@ -71,8 +72,11 @@ const MainScene = () => {
           enableRotate={false}
         />
         <ambientLight intensity={2} />
-        <directionalLight intensity={2} position={[10, 10, 0]} />
-        <directionalLight intensity={0.5} position={[10, 10, 10]} />
+        <directionalLight castShadow position={[10, 10, 5]} intensity={2} color={"#FFFFFF"} shadow-mapSize={[1024, 1024]}>
+            <orthographicCamera attach="shadow-camera" args={[-5, 5, 5, -5]} />
+        </directionalLight>
+        <directionalLight intensity={0.5} position={[-10, 10, 10]} />
+        <gridHelper args={[50, 50]} position={[0, -3, 0]} />
         <Model selectedTexture={selectedTexture} selectedModel={selectedModel} />
       </Canvas>
     </>
