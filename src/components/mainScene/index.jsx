@@ -76,7 +76,7 @@ const MainScene = () => {
             <orthographicCamera attach="shadow-camera" args={[-5, 5, 5, -5]} />
         </directionalLight>
         <directionalLight intensity={0.5} position={[-10, 10, 10]} />
-        <gridHelper args={[50, 50]} position={[0, -3, 0]} />
+        {/* <gridHelper args={[50, 50]} position={[0, -3, 0]} /> */}
         <Model selectedTexture={selectedTexture} selectedModel={selectedModel} />
       </Canvas>
     </>
