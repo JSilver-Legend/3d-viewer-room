@@ -70,6 +70,7 @@ const MainScene = () => {
           maxPolarAngle={Math.PI / 2.1}
           enableZoom={false}
           enableRotate={false}
+          enablePan={false}
         />
         <ambientLight intensity={2} />
         <directionalLight castShadow position={[10, 10, 5]} intensity={2} color={"#FFFFFF"} shadow-mapSize={[1024, 1024]}>
