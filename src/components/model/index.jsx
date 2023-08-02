@@ -1,6 +1,7 @@
+import * as THREE from 'three';
 import React, { useState, Suspense, useEffect, useRef } from 'react';
 import { useDrag } from '@use-gesture/react';
-import { TextureLoader, DoubleSide } from 'three';
+import { TextureLoader, DoubleSide, CompressedArrayTexture } from 'three';
 import { useLoader } from '@react-three/fiber';
 import { MeshStandardMaterial } from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
@@ -24,8 +25,23 @@ const Model = ({ selectedTexture, selectedModel }) => {
   const [model, setModel] = useState(bed);
 
   const textureImg01 = new TextureLoader().load(Texture01);
+  textureImg01.wrapS = textureImg01.wrapT = THREE.RepeatWrapping;
+  textureImg01.repeat.set(1, 1);
+  textureImg01.rotation = Math.PI;
+  textureImg01.offset.x = 0.1;
+  textureImg01.offset.y = -0.2;
   const textureImg02 = new TextureLoader().load(Texture02);
+  textureImg02.wrapS = textureImg02.wrapT = THREE.RepeatWrapping;
+  textureImg02.repeat.set(1, 1);
+  textureImg02.rotation = Math.PI;
+  textureImg02.offset.x = 0.1;
+  textureImg02.offset.y = -0.2;
   const textureImg03 = new TextureLoader().load(Texture03);
+  textureImg03.wrapS = textureImg03.wrapT = THREE.RepeatWrapping;
+  textureImg03.repeat.set(1, 1);
+  textureImg03.rotation = Math.PI;
+  textureImg03.offset.x = 0.1;
+  textureImg03.offset.y = -0.2;
 
   useEffect(() => {
     var currentTexture;
@@ -38,10 +54,11 @@ const Model = ({ selectedTexture, selectedModel }) => {
         item.castShadow = true;
         item.receiveShadow = true;
         if( item.name === 'wood_obj' ) {          
+          console.log('item: ', item);
           item.material = new MeshStandardMaterial({
             side: DoubleSide,
             map: currentTexture,
-            metalness: 0.75,
+            metalness: 0.8,
             roughness: 0,
           });
         }
@@ -50,6 +67,7 @@ const Model = ({ selectedTexture, selectedModel }) => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedTexture]);
   
+  //init show model
   useEffect(() => {
     if( model !== undefined ) {
       model.traverse(function (item) {
@@ -59,7 +77,7 @@ const Model = ({ selectedTexture, selectedModel }) => {
           item.material = new MeshStandardMaterial({
             side: DoubleSide,
             map: textureImg03,
-            metalness: 0.75,
+            metalness: 0.8,
             roughness: 0,
           });
         } else if( item.name === 'cloth_obj' ) {
@@ -72,8 +90,7 @@ const Model = ({ selectedTexture, selectedModel }) => {
             side: DoubleSide,
             color: 'white',
             roughness: 0.9,
-            metalness: 0.7
-          })
+            metalness: 0.8          })
         }
       })
     }
@@ -87,6 +104,7 @@ const Model = ({ selectedTexture, selectedModel }) => {
     else if( selectedModel === 'model-3' ) setModel(smallBox);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedModel])
+
   //scale value set
   useEffect(() => {
     if (model !== undefined && torusRef !== undefined) {
@@ -138,7 +156,7 @@ const Model = ({ selectedTexture, selectedModel }) => {
     { pointerEvents: true },
   );
 
-  const bindChair = useDrag(
+  const bindModel = useDrag(
     ({ down, delta, first }) => {
       if( first ) {
         setIsRotating(false);
@@ -152,17 +170,17 @@ const Model = ({ selectedTexture, selectedModel }) => {
   );
 
   return (
-    <group castShadow receiveShadow position={[positionX,-1.3,positionY]} rotation={[-0.1,rotate,0]} scale={[1.3, 1.3, 1.3]} >
+    <group castShadow receiveShadow position={[positionX,-1.3,positionY]} rotation={[-0.1,rotate,0]} scale={[1.3, 1.3, 1.3]}>
       <group castShadow receiveShadow name='chair-group'>
-        <group castShadow receiveShadow {...bindChair()} name='chair' position={[0,-0.5,0]} scale={[500, 500, 500]} >
-          <Suspense fallback={null} >
-            <primitive object={model} >
+        <group castShadow receiveShadow {...bindModel()} name='chair' position={[0,-0.5,0]} scale={[500, 500, 500]}>
+          <Suspense fallback={null}>
+            <primitive object={model}>
               <mesh />
             </primitive>
           </Suspense>
         </group>
-        <group {...bindRotate()} name='arrow' onPointerEnter={()=>{ setRingColor('red') }} onPointerLeave={()=>{ setRingColor('white') }} >
-          <mesh ref={torusRef} position={[0,-0.5,0]} rotation={[Math.PI/2,0,0]} >
+        <group {...bindRotate()} name='arrow' onPointerEnter={()=>{ setRingColor('red') }} onPointerLeave={()=>{ setRingColor('white') }}>
+          <mesh ref={torusRef} position={[0,-0.5,0]} rotation={[Math.PI/2,0,0]}>
             <torusGeometry args={[0.8, 0.02, 3, 500]} />
             <meshStandardMaterial color={ringColor} />
           </mesh>
