@@ -16,7 +16,6 @@ const MainScene = () => {
 
   const [selectedTexture, setSelectedTexture] = useState('texture-1');
   const [selectedModel, setSelectedModel] = useState('model-1');
-  // const [mouseState, setMouseState] = useState("none")
   
   return (
     <>
@@ -44,10 +43,6 @@ const MainScene = () => {
         <div className='menu-item' onClick={()=>{ setSelectedTexture('texture-3'); }}>
           <img alt='texture03' width={80} height={80} src={Texture03} />
         </div>
-        {/* <div className='handle-scale-area'>
-          <button style={{ borderColor: "white", borderRadius: 10, height: 30}} onPointerDown={() => setMouseState("increase")} onMouseUp={() => setMouseState("none")}>scale +</button>
-          <button style={{ borderColor: "white", borderRadius: 10, height: 30}} onPointerDown={() => setMouseState("decrease")} onMouseUp={() => setMouseState("none")}>scale -</button>
-        </div> */}
       </div>
 
       <Canvas 

@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import React, { useState, Suspense, useEffect, useRef } from 'react';
+import React, { useState, Suspense, useEffect, useRef, useMemo } from 'react';
 import { useDrag } from '@use-gesture/react';
 import { TextureLoader, DoubleSide, CompressedArrayTexture } from 'three';
 import { useLoader } from '@react-three/fiber';
@@ -9,6 +9,7 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import Texture01 from '../../assets/texture-1.png';
 import Texture02 from '../../assets/texture-2.png';
 import Texture03 from '../../assets/texture-3.png';
+import { GradientTexture } from '@react-three/drei';
 
 const Model = ({ selectedTexture, selectedModel }) => {
   
@@ -16,11 +17,12 @@ const Model = ({ selectedTexture, selectedModel }) => {
   const largeBox = useLoader(GLTFLoader, '/assets/glb/largebox.glb').scene;
   const smallBox = useLoader(GLTFLoader, '/assets/glb/smallbox.glb').scene;
 
-  const torusRef = useRef();
+  const modelRef = useRef();
   const [rotate, setRotate] = useState(0);
   const [ringColor, setRingColor] = useState('white');
   const [positionX, setPositionX] = useState(0);
   const [positionY, setPositionY] = useState(-4);
+  // console.log('x - y : ', positionX, positionY);
   const [isRotating, setIsRotating] = useState(false);
   const [model, setModel] = useState(bed);
 
@@ -43,6 +45,53 @@ const Model = ({ selectedTexture, selectedModel }) => {
   textureImg03.offset.x = 0.1;
   textureImg03.offset.y = -0.2;
 
+  const limitValue = useMemo(() => {
+    const minLimitX = -window.innerWidth * 0.004 / 2.2;
+    const maxLimitX = window.innerWidth * 0.004 / 2.2;
+    const minLimitY = -4;
+    const maxLimitY = -1;
+
+    return {minLimitX, maxLimitX, minLimitY, maxLimitY}
+  }, [window.innerWidth, window.innerHeight])
+  
+  const bindRotate = useDrag(
+    ({ down, delta, first, event }) => {
+      if( first ) {
+        setIsRotating(true);
+      }
+      if( down ) {
+        setRotate((prev)=>prev+delta[0]*0.01);
+      }
+    },
+    { pointerEvents: true },
+  );
+
+  const bindModel = useDrag(
+    ({ down, delta, first }) => {
+      if( first ) {
+        setIsRotating(false);
+      }
+      if( down && !isRotating  ) {
+        if (positionX >= limitValue.minLimitX && positionX <= limitValue.maxLimitX) {
+          if (positionY <= limitValue.maxLimitY && positionY >= (-0.56 * positionX - 3.62) ) {
+            setPositionX((prev) => prev + delta[0] * 0.005);
+            setPositionY((prev) => prev + delta[1] * 0.005);
+          } else if (positionY > limitValue.maxLimitY) {
+            setPositionY(limitValue.maxLimitY)
+          } else if (positionY < (-0.56 * positionX - 3.62)) {
+            setPositionY((-0.56 * positionX - 3.62));
+          }
+        } else if (positionX < limitValue.minLimitX) {
+          setPositionX(limitValue.minLimitX);
+        } else if (positionX > limitValue.maxLimitX) {
+          setPositionX(limitValue.maxLimitX);
+        }
+      }
+    },
+    { pointerEvents: true }
+  );
+
+  //select model texture
   useEffect(() => {
     var currentTexture;
     if( selectedTexture === 'texture-1' ) currentTexture = textureImg01;
@@ -53,8 +102,7 @@ const Model = ({ selectedTexture, selectedModel }) => {
       model.traverse(function (item) {
         item.castShadow = true;
         item.receiveShadow = true;
-        if( item.name === 'wood_obj' ) {          
-          console.log('item: ', item);
+        if( item.name === 'wood_obj' ) {
           item.material = new MeshStandardMaterial({
             side: DoubleSide,
             map: currentTexture,
@@ -90,7 +138,8 @@ const Model = ({ selectedTexture, selectedModel }) => {
             side: DoubleSide,
             color: 'white',
             roughness: 0.9,
-            metalness: 0.8          })
+            metalness: 0.8
+          })
         }
       })
     }
@@ -102,88 +151,61 @@ const Model = ({ selectedTexture, selectedModel }) => {
     if( selectedModel === 'model-1' ) setModel(bed);
     else if( selectedModel === 'model-2' ) setModel(largeBox);
     else if( selectedModel === 'model-3' ) setModel(smallBox);
+    modelRef.current.scale.x = 1;
+    modelRef.current.scale.y = 1;
+    modelRef.current.scale.z = 1;
+
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedModel])
 
   //scale value set
   useEffect(() => {
-    if (model !== undefined && torusRef !== undefined) {
-      model.scale.x = 1;
-      model.scale.y = 1;
-      model.scale.z = 1;
-
-      torusRef.current.scale.x = 1;
-      torusRef.current.scale.y = 1;
-      torusRef.current.scale.z = 1;
-
+    if (model !== undefined && modelRef.current !== undefined) {
       document.addEventListener("wheel", (event) => {
         if (event.deltaY < 0) {
-          if (model.scale.x < 1.49) {
-            model.scale.x += 0.01;
-            model.scale.y += 0.01;
-            model.scale.z += 0.01;
-  
-            torusRef.current.scale.x += 0.01;
-            torusRef.current.scale.y += 0.01;
-            torusRef.current.scale.z += 0.01;
+          if (modelRef.current.scale.x < 1.49) {  
+            modelRef.current.scale.x += 0.01;
+            modelRef.current.scale.y += 0.01;
+            modelRef.current.scale.z += 0.01;
           }
         } else if (event.deltaY > 0) {
-          if (model.scale.x > 1) {
-            model.scale.x -= 0.01;
-            model.scale.y -= 0.01;
-            model.scale.z -= 0.01;
-  
-            torusRef.current.scale.x -= 0.01;
-            torusRef.current.scale.y -= 0.01;
-            torusRef.current.scale.z -= 0.01;
+          if (modelRef.current.scale.x > 1) {  
+            modelRef.current.scale.x -= 0.01;
+            modelRef.current.scale.y -= 0.01;
+            modelRef.current.scale.z -= 0.01;
           }
         }
       })
     }
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [model])
-
-  const bindRotate = useDrag(
-    ({ down, delta, first, event }) => {
-      if( first ) {
-        setIsRotating(true);
-      }
-      if( down ) {
-        setRotate((prev)=>prev+delta[0]*0.01);
-      }
-    },
-    { pointerEvents: true },
-  );
-
-  const bindModel = useDrag(
-    ({ down, delta, first }) => {
-      if( first ) {
-        setIsRotating(false);
-      }
-      if( down && !isRotating  ) {
-        setPositionX((prev)=>prev+delta[0]*0.005);
-        setPositionY((prev)=>prev+delta[1]*0.005);
-      }
-    },
-    { pointerEvents: true }
-  );
+  }, [model, modelRef])
 
   return (
-    <group castShadow receiveShadow position={[positionX,-1.3,positionY]} rotation={[-0.1,rotate,0]} scale={[1.3, 1.3, 1.3]}>
-      <group castShadow receiveShadow name='chair-group'>
-        <group castShadow receiveShadow {...bindModel()} name='chair' position={[0,-0.5,0]} scale={[500, 500, 500]}>
-          <Suspense fallback={null}>
-            <primitive object={model}>
-              <mesh />
-            </primitive>
-          </Suspense>
-        </group>
-        <group {...bindRotate()} name='arrow' onPointerEnter={()=>{ setRingColor('red') }} onPointerLeave={()=>{ setRingColor('white') }}>
-          <mesh ref={torusRef} position={[0,-0.5,0]} rotation={[Math.PI/2,0,0]}>
-            <torusGeometry args={[0.8, 0.02, 3, 500]} />
-            <meshStandardMaterial color={ringColor} />
-          </mesh>
+    <group>
+      <mesh rotation={[Math.PI / 4, Math.PI / 4, 0]}>
+        <boxGeometry args={[0.1, 0.1, 0.1]} />
+        <meshStandardMaterial color={"green"} />
+      </mesh>
+      <group ref={modelRef} castShadow receiveShadow position={[positionX, -1.1, positionY]} rotation={[-0.1 ,rotate, 0]} scale={[1.3, 1.3, 1.3]}>
+        <group castShadow receiveShadow name='chair-group'>
+          <group castShadow receiveShadow {...bindModel()} name='chair' position={[0, -0.5, 0]} scale={[500, 500, 500]}>
+            <Suspense fallback={null}>
+              <primitive object={model}>
+                <mesh />
+              </primitive>
+            </Suspense>
+          </group>
+          <group {...bindRotate()} name='arrow' onPointerEnter={()=>{ setRingColor('red') }} onPointerLeave={()=>{ setRingColor('white') }} rotation={[0, -1.1, 0]}>
+            <mesh position={[0, -0.5, 0]} rotation={[Math.PI/2,0,0]}>
+              <torusGeometry args={[0.8, 0.02, 25, 60, 6.1]} />
+              <meshStandardMaterial color={ringColor} side={DoubleSide} />
+            </mesh>
+            <mesh position={[0.795, -0.5, -0.04]} rotation={[-Math.PI / 2, 0, 0]}>
+              <coneGeometry args={[0.04, 0.16, 25, 1]} />
+              <meshStandardMaterial color={'red'} side={DoubleSide} />
+            </mesh>
+          </group>
         </group>
       </group>
     </group>
