@@ -24,6 +24,7 @@ const Model = ({ selectedTexture, selectedModel }) => {
   const [positionY, setPositionY] = useState(-4);
   // console.log('x - y : ', positionX, positionY);
   const [isRotating, setIsRotating] = useState(false);
+  const [isDrawing, setIsDrawing] = useState(false);
   const [model, setModel] = useState(bed);
 
   const textureImg01 = new TextureLoader().load(Texture01);
@@ -72,6 +73,8 @@ const Model = ({ selectedTexture, selectedModel }) => {
         setIsRotating(false);
       }
       if( down && !isRotating  ) {
+        setIsDrawing(true);
+        
         if (positionX >= limitValue.minLimitX && positionX <= limitValue.maxLimitX) {
           if (positionY <= limitValue.maxLimitY && positionY >= (-0.56 * positionX - 3.62) ) {
             setPositionX((prev) => prev + delta[0] * 0.005);
@@ -87,6 +90,8 @@ const Model = ({ selectedTexture, selectedModel }) => {
           setPositionX(limitValue.maxLimitX);
         }
       }
+      if ( !down )
+        setIsDrawing(false);
     },
     { pointerEvents: true }
   );
@@ -191,14 +196,14 @@ const Model = ({ selectedTexture, selectedModel }) => {
             </primitive>
           </Suspense>
         </group>
-        <group {...bindRotate()} name='arrow' onPointerEnter={()=>{ setRingColor('red') }} onPointerLeave={()=>{ setRingColor('white') }} rotation={[0, -1.1, 0]}>
+        <group {...bindRotate()} name='arrow' onPointerEnter={()=>{ isDrawing ? setRingColor('white') : setRingColor('red') }} onPointerLeave={()=>{ setRingColor('white') }} rotation={[0, -1.1, 0]}>
           <mesh position={[0, -0.5, 0]} rotation={[Math.PI/2,0,0]}>
             <torusGeometry args={[0.8, 0.02, 25, 60, 6.1]} />
-            <meshStandardMaterial color={ringColor} side={DoubleSide} />
+            <meshStandardMaterial color={ringColor} side={DoubleSide} metalness={0.6} />
           </mesh>
           <mesh position={[0.795, -0.5, -0.04]} rotation={[-Math.PI / 2, 0, 0]}>
             <coneGeometry args={[0.04, 0.16, 25, 1]} />
-            <meshStandardMaterial color={'red'} side={DoubleSide} />
+            <meshStandardMaterial color={'red'} side={DoubleSide} metalness={0.6} />
           </mesh>
         </group>
       </group>
