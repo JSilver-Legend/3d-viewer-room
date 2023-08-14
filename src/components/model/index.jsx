@@ -182,30 +182,24 @@ const Model = ({ selectedTexture, selectedModel }) => {
   }, [model, modelRef])
 
   return (
-    <group>
-      <mesh rotation={[Math.PI / 4, Math.PI / 4, 0]}>
-        <boxGeometry args={[0.1, 0.1, 0.1]} />
-        <meshStandardMaterial color={"green"} />
-      </mesh>
-      <group ref={modelRef} castShadow receiveShadow position={[positionX, -1.1, positionY]} rotation={[-0.1 ,rotate, 0]} scale={[1.3, 1.3, 1.3]}>
-        <group castShadow receiveShadow name='chair-group'>
-          <group castShadow receiveShadow {...bindModel()} name='chair' position={[0, -0.5, 0]} scale={[500, 500, 500]}>
-            <Suspense fallback={null}>
-              <primitive object={model}>
-                <mesh />
-              </primitive>
-            </Suspense>
-          </group>
-          <group {...bindRotate()} name='arrow' onPointerEnter={()=>{ setRingColor('red') }} onPointerLeave={()=>{ setRingColor('white') }} rotation={[0, -1.1, 0]}>
-            <mesh position={[0, -0.5, 0]} rotation={[Math.PI/2,0,0]}>
-              <torusGeometry args={[0.8, 0.02, 25, 60, 6.1]} />
-              <meshStandardMaterial color={ringColor} side={DoubleSide} />
-            </mesh>
-            <mesh position={[0.795, -0.5, -0.04]} rotation={[-Math.PI / 2, 0, 0]}>
-              <coneGeometry args={[0.04, 0.16, 25, 1]} />
-              <meshStandardMaterial color={'red'} side={DoubleSide} />
-            </mesh>
-          </group>
+    <group ref={modelRef} castShadow receiveShadow position={[positionX, -1.1, positionY]} rotation={[-0.1 ,rotate, 0]} scale={[1.3, 1.3, 1.3]}>
+      <group castShadow receiveShadow name='chair-group'>
+        <group castShadow receiveShadow {...bindModel()} name='chair' position={[0, -0.5, 0]} scale={[500, 500, 500]}>
+          <Suspense fallback={null}>
+            <primitive object={model}>
+              <mesh />
+            </primitive>
+          </Suspense>
+        </group>
+        <group {...bindRotate()} name='arrow' onPointerEnter={()=>{ setRingColor('red') }} onPointerLeave={()=>{ setRingColor('white') }} rotation={[0, -1.1, 0]}>
+          <mesh position={[0, -0.5, 0]} rotation={[Math.PI/2,0,0]}>
+            <torusGeometry args={[0.8, 0.02, 25, 60, 6.1]} />
+            <meshStandardMaterial color={ringColor} side={DoubleSide} />
+          </mesh>
+          <mesh position={[0.795, -0.5, -0.04]} rotation={[-Math.PI / 2, 0, 0]}>
+            <coneGeometry args={[0.04, 0.16, 25, 1]} />
+            <meshStandardMaterial color={'red'} side={DoubleSide} />
+          </mesh>
         </group>
       </group>
     </group>
