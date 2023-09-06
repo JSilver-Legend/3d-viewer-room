@@ -1,10 +1,11 @@
+import Components from './components';
+
 import './App.css';
-import MainScene from './components/mainScene';
 
 function App() {
   return (
     <div className="App">
-      <MainScene />
+      <Components />
     </div>
   );
 }
